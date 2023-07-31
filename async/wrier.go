@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -105,15 +104,12 @@ func (w *AsyncWriter) writer() {
 	for {
 		select {
 		case b := <-w.queue:
-			fmt.Printf("write %s \n", string(b.Bytes()))
 			_, err = w.wr.Write(b.Bytes())
 			w.sendIfError(err)
 			_asyncBufferPool.Put(b)
 		case <-w.ctx.Done():
 			// Stop the writer goroutine gracefully when the context is canceled.
-			fmt.Println("Stop the writer goroutine gracefully when the context is canceled.")
 			w.onClose()
-			fmt.Println("writer()  end")
 			return
 		}
 	}
@@ -145,9 +141,7 @@ func (w *AsyncWriter) Close(wg *sync.WaitGroup) (err error) {
 
 // onClose set closed and close the file once
 func (w *AsyncWriter) onClose() (err error) {
-	fmt.Println("onClose start")
 	if w.isClosed.Load() {
-		fmt.Println("onClose closed already")
 		return ErrClosed
 	}
 	w.isClosed.Store(true)
@@ -156,13 +150,11 @@ func (w *AsyncWriter) onClose() (err error) {
 	// if w, ok := w.wr.(io.Closer); ok {
 	// 	err = w.Close()
 	// }
-	fmt.Println("onClose end")
 	return err
 }
 
 // flushQueue process remaining buffered data for asynchronous writer
 func (w *AsyncWriter) flushQueue() {
-	fmt.Println("flushQueue")
 	var err error
 	for {
 		select {

@@ -3,7 +3,6 @@ package async
 import (
 	"bytes"
 	"compress/gzip"
-	"context"
 	"io"
 	"os"
 	"testing"
@@ -20,7 +19,7 @@ func Test_AsyncGzipFileWriter(t *testing.T) {
 	defer os.Remove(tempFile.Name())
 
 	// Create an AsyncGzipFileWriter for testing.
-	writer, err := NewGzipFileWriter(context.Background(), tempFile.Name(), true)
+	writer, err := NewGzipFileWriter(tempFile.Name(), true)
 	if err != nil {
 		t.Fatalf("Failed to create AsyncGzipFileWriter: %v", err)
 	}
@@ -62,7 +61,7 @@ func Test_AsyncGzipFileWriter_NoGzip(t *testing.T) {
 	defer os.Remove(tempFileName)
 
 	// Create an AsyncGzipFileWriter for testing.
-	aw, err := NewGzipFileWriter(context.Background(), tempFileName, false)
+	aw, err := NewGzipFileWriter(tempFileName, false)
 	if err != nil {
 		t.Fatalf("Failed to create AsyncGzipFileWriter: %v", err)
 	}
@@ -89,7 +88,7 @@ func Test_AsyncGzipFileWriter_NoGzip(t *testing.T) {
 func Test_AsyncGzipFileWriter_ErrorCreateFile(t *testing.T) {
 	// Try to create an AsyncGzipFileWriter with a non-existent directory.
 	// This should trigger an error during file creation.
-	_, err := NewGzipFileWriter(context.Background(), "/nonexistent_directory/test_file", true)
+	_, err := NewGzipFileWriter("/nonexistent_directory/test_file", true)
 	assert.Error(t, err, "Expected error when creating file in non-existent directory")
 
 	// Verify that the error is due to non-existent directory.

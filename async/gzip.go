@@ -3,7 +3,6 @@ package async
 import (
 	"compress/gzip"
 	"context"
-	"fmt"
 	"os"
 	"sync"
 )
@@ -17,7 +16,8 @@ type GzipFileWriter struct {
 }
 
 // NewGzipFileWriter creates a new AsyncGzipFileWriter with the specified file path.
-func NewGzipFileWriter(ctx context.Context, filePath string, gzipIt bool) (*GzipFileWriter, error) {
+func NewGzipFileWriter(filePath string, gzipIt bool) (*GzipFileWriter, error) {
+	ctx := context.Background()
 	// Open the file for writing.
 	file, err := os.Create(filePath)
 	if err != nil {
@@ -51,7 +51,6 @@ func (aw *GzipFileWriter) Close() (err error) {
 	err = aw.writer.Close(&aw.wg)
 	// // If  use gzip writer, close it.
 	// // Otherwise, it just was closed by AsyncWriter.
-	fmt.Println("close gzip  writer")
 	if aw.gzipWriter != nil {
 		err = aw.gzipWriter.Flush()
 		if err != nil {
@@ -63,7 +62,6 @@ func (aw *GzipFileWriter) Close() (err error) {
 		}
 	}
 	if aw.file != nil {
-		fmt.Println("close file writer")
 		err = aw.file.Close()
 	}
 
