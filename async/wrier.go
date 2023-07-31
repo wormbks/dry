@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -36,31 +37,34 @@ var (
 )
 
 type AsyncWriter struct {
-	wr       io.Writer
-	ctx      context.Context
-	queue    chan *bytes.Buffer
-	errChan  chan error
-	isClosed atomic.Bool
-	stop     chan int // Channel to signal the writer goroutine to stop
+	wr         io.Writer
+	ctx        context.Context
+	queue      chan *bytes.Buffer
+	errChan    chan error
+	isClosed   atomic.Bool
+	cancelFunc context.CancelFunc
+	wg         *sync.WaitGroup
 }
 
-func NewAsyncWriter(context context.Context, writer io.WriteCloser) *AsyncWriter {
+func NewAsyncWriter(ctx context.Context, writer io.WriteCloser, wg *sync.WaitGroup) *AsyncWriter {
 	result := &AsyncWriter{
 		wr:      writer,
-		ctx:     context,
 		queue:   make(chan *bytes.Buffer, QueueSize),
 		errChan: make(chan error, QueueSize),
-		stop:    make(chan int),
+		wg:      wg,
+		// stop:    make(chan int),
 	}
+	result.ctx, result.cancelFunc = context.WithCancel(ctx)
 	result.isClosed.Store(false)
 	// buffer pool for asynchronous writer
+	result.start()
 	return result
 }
 
 // start the asynchronous writer
-func (w *AsyncWriter) Start(wg *sync.WaitGroup) {
-	wg.Add(1)
-	go w.writer(wg)
+func (w *AsyncWriter) start() {
+	w.wg.Add(1)
+	go w.writer()
 }
 
 // Only when the error channel is empty, otherwise nothing will write and the last error will be
@@ -81,7 +85,6 @@ func (w *AsyncWriter) Write(b []byte) (int, error) {
 		bb := _asyncBufferPool.Get().(*bytes.Buffer)
 		bb.Reset()          // remove old buffer data
 		n, _ := bb.Write(b) // bytes.Buffer Write returns error nil	all the time
-
 		select {
 
 		case w.queue <- bb:
@@ -96,28 +99,29 @@ func (w *AsyncWriter) Write(b []byte) (int, error) {
 
 // writer do the asynchronous write independently
 // Take care of reopen, I am not sure if there need no lock
-func (w *AsyncWriter) writer(wg *sync.WaitGroup) {
+func (w *AsyncWriter) writer() {
 	var err error
-	defer wg.Done()
+	defer w.wg.Done()
 	for {
 		select {
 		case b := <-w.queue:
-			// fmt.Printf("write %s \n", string(b.Bytes()))
+			fmt.Printf("write %s \n", string(b.Bytes()))
 			_, err = w.wr.Write(b.Bytes())
 			w.sendIfError(err)
 			_asyncBufferPool.Put(b)
 		case <-w.ctx.Done():
 			// Stop the writer goroutine gracefully when the context is canceled.
+			fmt.Println("Stop the writer goroutine gracefully when the context is canceled.")
 			w.onClose()
-			return
-		case <-w.stop:
-			// Stop the writer goroutine gracefully when the stop signal is received.
-			w.onClose()
+			fmt.Println("writer()  end")
 			return
 		}
 	}
 }
 
+// sendIfError sends the error to the error channel if it is not nil.
+//
+// It takes an error as a parameter and does not return anything.
 func (w *AsyncWriter) sendIfError(err error) {
 	if err != nil {
 		select {
@@ -127,42 +131,45 @@ func (w *AsyncWriter) sendIfError(err error) {
 	}
 }
 
-func (w *AsyncWriter) Close() (err error) {
-	if !w.isClosed.Load() {
-		//close(w.stop) // Send the stop signal to the writer goroutine
-		w.stop <- 1
-		return err
-	}
-	return ErrClosed
+// Close closes the AsyncWriter.
+//
+// It cancels the writer goroutine and waits for it to finish.
+// It takes a sync.WaitGroup as a parameter to coordinate the closing.
+// It returns an error if there is any.
+func (w *AsyncWriter) Close(wg *sync.WaitGroup) (err error) {
+	// close(w.stop) // Send the stop signal to the writer goroutine
+	w.cancelFunc()
+	wg.Wait()
+	return nil
 }
 
 // onClose set closed and close the file once
 func (w *AsyncWriter) onClose() (err error) {
+	fmt.Println("onClose start")
 	if w.isClosed.Load() {
+		fmt.Println("onClose closed already")
 		return ErrClosed
 	}
 	w.isClosed.Store(true)
 	w.flushQueue()
-	// does writer has ioCloser interface
-	if w, ok := w.wr.(io.Closer); ok {
-		err = w.Close()
-	}
+	// does underlining writer has io.Closer interface
+	// if w, ok := w.wr.(io.Closer); ok {
+	// 	err = w.Close()
+	// }
+	fmt.Println("onClose end")
 	return err
 }
 
 // flushQueue process remaining buffered data for asynchronous writer
 func (w *AsyncWriter) flushQueue() {
+	fmt.Println("flushQueue")
 	var err error
 	for {
 		select {
 		case b := <-w.queue:
 			// flush all remaining field
-			if _, err = w.wr.Write(b.Bytes()); err != nil {
-				select {
-				case w.errChan <- err:
-				default:
-				}
-			}
+			_, err = w.wr.Write(b.Bytes())
+			w.sendIfError(err)
 			_asyncBufferPool.Put(b)
 		default: // after the queue was empty, return
 			return
