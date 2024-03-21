@@ -1,4 +1,4 @@
-package dry
+package str
 
 import (
 	"bytes"
@@ -108,4 +108,16 @@ func (s *StringBuilder) Bytes() []byte {
 // Returns a string.
 func (s *StringBuilder) String() string {
 	return s.buffer.String()
+}
+
+// Reset clears the content of the string builder.
+func (s *StringBuilder) Reset() {
+	s.buffer.Reset()
+}
+
+// Grow resizes the underlying buffer of the StringBuilder to accommodate at least `size` elements.
+//
+// size: the desired size of the buffer.
+func (s *StringBuilder) Grow(size int) {
+	s.buffer.Grow(size)
 }

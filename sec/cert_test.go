@@ -1,4 +1,4 @@
-package cert
+package sec
 
 import (
 	"os"
@@ -31,14 +31,12 @@ G3Q0NymBgXSzjSOwtpKD3K9je3SZvPHE2l3ekFKeUU51SfuKpErPLJ8k
 )
 
 func Test_GetKeyPair(t *testing.T) {
-
 	// Test case 1: real  Cert and key
 	_, err := GetKeyPair(realCertContent, realKeyContent)
 	assert.NoError(t, err)
 }
 
 func Test_CamControl_AddTlsCert_negative(t *testing.T) {
-
 	// Mock certificate and key contents
 	certContent := "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
 	keyContent := "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
@@ -70,40 +68,39 @@ func Test_CamControl_AddTlsCert_negative(t *testing.T) {
 	// Test case 6: Error reading key file
 	_, err = GetKeyPair(certContent, "/nonexistent/key.pem")
 	assert.Error(t, err)
-
 }
 
 func Test_IsStringLikeFilePath(t *testing.T) {
 	// Test case 1: Relative path
-	result := IsStringLikeFilePath("../path/to/file.txt")
+	result := isStringLikeFilePath("../path/to/file.txt")
 	assert.True(t, result)
 
 	// Test case 2: Absolute path
-	result = IsStringLikeFilePath("/path/to/file.txt")
+	result = isStringLikeFilePath("/path/to/file.txt")
 	assert.True(t, result)
 
 	// Test case 3: Path with redundant separators
-	result = IsStringLikeFilePath("path/to//file.txt")
+	result = isStringLikeFilePath("path/to//file.txt")
 	assert.True(t, result)
 
 	// Test case 4: Path with references to the current directory
-	result = IsStringLikeFilePath("./path/to/file.txt")
+	result = isStringLikeFilePath("./path/to/file.txt")
 	assert.True(t, result)
 
 	// Test case 5: Path with directory separator
-	result = IsStringLikeFilePath("path/to/file/")
+	result = isStringLikeFilePath("path/to/file/")
 	assert.True(t, result)
 
 	// Test case 6: Path with only directory separator
-	result = IsStringLikeFilePath("/")
+	result = isStringLikeFilePath("/")
 	assert.True(t, result)
 
 	// Test case 7: Empty string
-	result = IsStringLikeFilePath("")
+	result = isStringLikeFilePath("")
 	assert.False(t, result)
 
 	// Test case 8: Real  key
-	result = IsStringLikeFilePath(realKeyContent)
+	result = isStringLikeFilePath(realKeyContent)
 	assert.False(t, result)
 }
 
@@ -113,9 +110,9 @@ func TestSetTlsConfig_FilePaths(t *testing.T) {
 	keyPath := "/tmp/key.pem"
 	certContent := "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
 	keyContent := "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-	err := os.WriteFile(certPath, []byte(certContent), 0644)
+	err := os.WriteFile(certPath, []byte(certContent), 0o644)
 	assert.NoError(t, err)
-	err = os.WriteFile(keyPath, []byte(keyContent), 0644)
+	err = os.WriteFile(keyPath, []byte(keyContent), 0o644)
 	assert.NoError(t, err)
 
 	// Call the setTlsConfig method with file paths
@@ -152,10 +149,19 @@ func TestSetTlsConfig_InvalidFiles(t *testing.T) {
 	// Call the setTlsConfig method with invalid file paths
 	certPath := "/tmp/nonexistent_cert.pem"
 	keyPath := "/tmp/nonexistent_key.pem"
+	certContent := "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
 
 	tlsConfig, err := GetTlsConfig(certPath, keyPath)
 
 	// Assert that an error is returned and the TLS configuration is nil
+	assert.Error(t, err)
+	assert.Nil(t, tlsConfig)
+
+	err = os.WriteFile(certPath, []byte(certContent), 0o644)
+	assert.NoError(t, err)
+	defer os.Remove(certPath)
+
+	tlsConfig, err = GetTlsConfig(certPath, keyPath)
 	assert.Error(t, err)
 	assert.Nil(t, tlsConfig)
 }

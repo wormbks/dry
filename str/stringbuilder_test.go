@@ -1,4 +1,4 @@
-package dry
+package str
 
 import (
 	"bytes"
