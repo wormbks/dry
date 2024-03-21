@@ -2,29 +2,29 @@
 
 # iter
 
-```go
-import "qlmedge/proxy/pkg/iter"
-```
+
 
 Package iter provides various types of iterators including generic array iterator, directory iterator and integer range iterator. These iterators are designed to provide a simple and consistent interface for iterating over collections or ranges.
 
 ## Index
 
-- [type DirIterator](#type-diriterator)
-  - [func NewDirIterator\(root string\) \(\*DirIterator, error\)](#func-newdiriterator)
-  - [func \(iter \*DirIterator\) Next\(\) \(string, error\)](#func-diriterator-next)
-- [type IntRangeIterator](#type-intrangeiterator)
-  - [func NewIntRangeIterator\(start, end int\) \*IntRangeIterator](#func-newintrangeiterator)
-  - [func \(it \*IntRangeIterator\) Next\(\) \(int, bool\)](#func-intrangeiterator-next)
-  - [func \(it \*IntRangeIterator\) Reset\(\)](#func-intrangeiterator-reset)
-- [type LoopIteratorr](#type-loopiteratorr)
-  - [func NewLoopIterator\[T any\]\(data \[\]T\) \*LoopIteratorr\[T\]](#func-newloopiterator)
-  - [func \(iter \*LoopIteratorr\[T\]\) Next\(\) T](#func-loopiteratorr[t]-next)
-  - [func \(iter \*LoopIteratorr\[T\]\) Reset\(\)](#func-loopiteratorr[t]-reset)
-- [type LoopingIntRangeIterator](#type-loopingintrangeiterator)
-  - [func NewLoopingIntRangeIterator\(start, end int\) \*LoopingIntRangeIterator](#func-newloopingintrangeiterator)
-  - [func \(it \*LoopingIntRangeIterator\) Next\(\) int](#func-loopingintrangeiterator-next)
-  - [func \(it \*LoopingIntRangeIterator\) Reset\(\)](#func-loopingintrangeiterator-reset)
+- [iter](#iter)
+  - [Index](#index)
+  - [type DirIterator](#type-diriterator)
+    - [func NewDirIterator](#func-newdiriterator)
+    - [func (\*DirIterator) Next](#func-diriterator-next)
+  - [type IntRangeIterator](#type-intrangeiterator)
+    - [func NewIntRangeIterator](#func-newintrangeiterator)
+    - [func (\*IntRangeIterator) Next](#func-intrangeiterator-next)
+    - [func (\*IntRangeIterator) Reset](#func-intrangeiterator-reset)
+  - [type LoopIteratorr](#type-loopiteratorr)
+    - [func NewLoopIterator](#func-newloopiterator)
+    - [func (\*LoopIteratorr\[T\]) Next](#func-loopiteratorrt-next)
+    - [func (\*LoopIteratorr\[T\]) Reset](#func-loopiteratorrt-reset)
+  - [type LoopingIntRangeIterator](#type-loopingintrangeiterator)
+    - [func NewLoopingIntRangeIterator](#func-newloopingintrangeiterator)
+    - [func (\*LoopingIntRangeIterator) Next](#func-loopingintrangeiterator-next)
+    - [func (\*LoopingIntRangeIterator) Reset](#func-loopingintrangeiterator-reset)
 
 
 ## type DirIterator

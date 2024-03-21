@@ -2,33 +2,33 @@
 
 # str
 
-```go
-import "qlmedge/proxy/pkg/str"
-```
+
 
 ## Index
 
-- [Constants](#constants)
-- [func BytesToString\(b \[\]byte\) string](#func-bytestostring)
-- [func StringToBytes\(s string\) \[\]byte](#func-stringtobytes)
-- [type StringBuilder](#type-stringbuilder)
-  - [func \(s \*StringBuilder\) Bool\(value bool\) \*StringBuilder](#func-stringbuilder-bool)
-  - [func \(s \*StringBuilder\) Byte\(value byte\) \*StringBuilder](#func-stringbuilder-byte)
-  - [func \(s \*StringBuilder\) Bytes\(\) \[\]byte](#func-stringbuilder-bytes)
-  - [func \(s \*StringBuilder\) Float\(value float64\) \*StringBuilder](#func-stringbuilder-float)
-  - [func \(s \*StringBuilder\) Grow\(size int\)](#func-stringbuilder-grow)
-  - [func \(s \*StringBuilder\) Int\(value int\) \*StringBuilder](#func-stringbuilder-int)
-  - [func \(s \*StringBuilder\) Printf\(format string, args ...interface\{\}\) \*StringBuilder](#func-stringbuilder-printf)
-  - [func \(s \*StringBuilder\) Reset\(\)](#func-stringbuilder-reset)
-  - [func \(s \*StringBuilder\) String\(\) string](#func-stringbuilder-string)
-  - [func \(s \*StringBuilder\) Uint\(value uint\) \*StringBuilder](#func-stringbuilder-uint)
-  - [func \(s \*StringBuilder\) Write\(strings ...string\) \*StringBuilder](#func-stringbuilder-write)
-  - [func \(s \*StringBuilder\) WriteBytes\(bytes \[\]byte\) \*StringBuilder](#func-stringbuilder-writebytes)
-  - [func \(s \*StringBuilder\) WriteTo\(writer io.Writer\) \(n int64, err error\)](#func-stringbuilder-writeto)
-- [type StringReplacer](#type-stringreplacer)
-  - [func NewStringReplacer\(replacePairs map\[string\]string\) \*StringReplacer](#func-newstringreplacer)
-  - [func \(sr \*StringReplacer\) Replace\(input string\) string](#func-stringreplacer-replace)
-  - [func \(sr \*StringReplacer\) ReverseReplace\(input string\) string](#func-stringreplacer-reversereplace)
+- [str](#str)
+  - [Index](#index)
+  - [Constants](#constants)
+  - [func BytesToString](#func-bytestostring)
+  - [func StringToBytes](#func-stringtobytes)
+  - [type StringBuilder](#type-stringbuilder)
+    - [func (\*StringBuilder) Bool](#func-stringbuilder-bool)
+    - [func (\*StringBuilder) Byte](#func-stringbuilder-byte)
+    - [func (\*StringBuilder) Bytes](#func-stringbuilder-bytes)
+    - [func (\*StringBuilder) Float](#func-stringbuilder-float)
+    - [func (\*StringBuilder) Grow](#func-stringbuilder-grow)
+    - [func (\*StringBuilder) Int](#func-stringbuilder-int)
+    - [func (\*StringBuilder) Printf](#func-stringbuilder-printf)
+    - [func (\*StringBuilder) Reset](#func-stringbuilder-reset)
+    - [func (\*StringBuilder) String](#func-stringbuilder-string)
+    - [func (\*StringBuilder) Uint](#func-stringbuilder-uint)
+    - [func (\*StringBuilder) Write](#func-stringbuilder-write)
+    - [func (\*StringBuilder) WriteBytes](#func-stringbuilder-writebytes)
+    - [func (\*StringBuilder) WriteTo](#func-stringbuilder-writeto)
+  - [type StringReplacer](#type-stringreplacer)
+    - [func NewStringReplacer](#func-newstringreplacer)
+    - [func (\*StringReplacer) Replace](#func-stringreplacer-replace)
+    - [func (\*StringReplacer) ReverseReplace](#func-stringreplacer-reversereplace)
 
 
 ## Constants
