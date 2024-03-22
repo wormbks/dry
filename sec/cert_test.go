@@ -165,3 +165,57 @@ func TestSetTlsConfig_InvalidFiles(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, tlsConfig)
 }
+
+func Test_GetCA(t *testing.T) {
+	// Test case 1: real CA
+	_, err := GetCA(realCertContent)
+	assert.NoError(t, err)
+}
+
+
+func Test_GetCA_WrongFile(t *testing.T) {
+	certPath := "/tmp/nonexistent_cert.pem"
+
+	_, err := GetCA(certPath)
+	assert.Error(t, err)
+}
+
+func Test_ReadTLSConfig(t *testing.T){
+	// Test case 1: real CA
+	_, err := ReadTLSConfig(realCertContent, realCertContent, realKeyContent)
+	assert.NoError(t, err)
+}
+
+
+func Test_ReadTLSConfig_WrongFiles(t *testing.T){
+	certPath := "/tmp/nonexistent_cert.pem"
+	keyPath := "/tmp/nonexistent_key.pem"
+
+	_, err := ReadTLSConfig(certPath, realCertContent, realKeyContent)
+	assert.Error(t, err)
+
+	_, err = ReadTLSConfig(realCertContent, certPath,  realKeyContent)
+	assert.Error(t, err)
+
+	_, err = ReadTLSConfig(realCertContent, realCertContent,  keyPath)
+	assert.Error(t, err)
+}
+
+
+func Test_ReadTLSConfig_EmptyPathes(t *testing.T){
+	empty := ""
+	_, err := ReadTLSConfig(empty, empty, empty)
+	assert.Error(t, err)
+}
+
+
+func Test_ReadTLSConfig_MixParams(t *testing.T){
+	empty := ""
+	_, err := ReadTLSConfig(realCertContent, empty, empty)
+	assert.NoError(t, err)
+	_, err = ReadTLSConfig(realCertContent, realCertContent, empty)
+	assert.Error(t, err)
+
+	_, err = ReadTLSConfig(realCertContent, empty, realKeyContent)
+	assert.Error(t, err)
+}

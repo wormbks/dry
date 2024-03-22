@@ -242,3 +242,5 @@ func isStringLikeFilePath(s string) bool {
 	// If the cleaned path is absolute or contains a directory separator, consider it as a file path
 	return !containsBegin && (filepath.IsAbs(cleanedPath) || containsSeparator)
 }
+
+
